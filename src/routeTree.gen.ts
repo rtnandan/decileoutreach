@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as UnsubscribeTokenRouteImport } from './routes/unsubscribe.$token'
 import { Route as AuthenticatedLeadsIndexRouteImport } from './routes/_authenticated/leads/index'
+import { Route as AuthenticatedLeadsImportRouteImport } from './routes/_authenticated/leads/import'
 import { Route as ApiPublicUnsubscribeRouteImport } from './routes/api/public/unsubscribe'
 import { Route as ApiPublicJobsSendBatchRouteImport } from './routes/api/public/jobs/send-batch'
 
@@ -47,6 +48,12 @@ const AuthenticatedLeadsIndexRoute = AuthenticatedLeadsIndexRouteImport.update({
   path: '/leads/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedLeadsImportRoute =
+  AuthenticatedLeadsImportRouteImport.update({
+    id: '/leads/import',
+    path: '/leads/import',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const ApiPublicUnsubscribeRoute = ApiPublicUnsubscribeRouteImport.update({
   id: '/api/public/unsubscribe',
   path: '/api/public/unsubscribe',
@@ -63,6 +70,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/unsubscribe/$token': typeof UnsubscribeTokenRoute
+  '/leads/import': typeof AuthenticatedLeadsImportRoute
   '/api/public/unsubscribe': typeof ApiPublicUnsubscribeRoute
   '/leads/': typeof AuthenticatedLeadsIndexRoute
   '/api/public/jobs/send-batch': typeof ApiPublicJobsSendBatchRoute
@@ -72,6 +80,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/unsubscribe/$token': typeof UnsubscribeTokenRoute
+  '/leads/import': typeof AuthenticatedLeadsImportRoute
   '/api/public/unsubscribe': typeof ApiPublicUnsubscribeRoute
   '/leads': typeof AuthenticatedLeadsIndexRoute
   '/api/public/jobs/send-batch': typeof ApiPublicJobsSendBatchRoute
@@ -83,6 +92,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/unsubscribe/$token': typeof UnsubscribeTokenRoute
+  '/_authenticated/leads/import': typeof AuthenticatedLeadsImportRoute
   '/api/public/unsubscribe': typeof ApiPublicUnsubscribeRoute
   '/_authenticated/leads/': typeof AuthenticatedLeadsIndexRoute
   '/api/public/jobs/send-batch': typeof ApiPublicJobsSendBatchRoute
@@ -94,6 +104,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/dashboard'
     | '/unsubscribe/$token'
+    | '/leads/import'
     | '/api/public/unsubscribe'
     | '/leads/'
     | '/api/public/jobs/send-batch'
@@ -103,6 +114,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/dashboard'
     | '/unsubscribe/$token'
+    | '/leads/import'
     | '/api/public/unsubscribe'
     | '/leads'
     | '/api/public/jobs/send-batch'
@@ -113,6 +125,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/dashboard'
     | '/unsubscribe/$token'
+    | '/_authenticated/leads/import'
     | '/api/public/unsubscribe'
     | '/_authenticated/leads/'
     | '/api/public/jobs/send-batch'
@@ -171,6 +184,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLeadsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/leads/import': {
+      id: '/_authenticated/leads/import'
+      path: '/leads/import'
+      fullPath: '/leads/import'
+      preLoaderRoute: typeof AuthenticatedLeadsImportRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/api/public/unsubscribe': {
       id: '/api/public/unsubscribe'
       path: '/api/public/unsubscribe'
@@ -190,11 +210,13 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedLeadsImportRoute: typeof AuthenticatedLeadsImportRoute
   AuthenticatedLeadsIndexRoute: typeof AuthenticatedLeadsIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedLeadsImportRoute: AuthenticatedLeadsImportRoute,
   AuthenticatedLeadsIndexRoute: AuthenticatedLeadsIndexRoute,
 }
 
