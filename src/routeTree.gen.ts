@@ -10,12 +10,24 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as UnsubscribeTokenRouteImport } from './routes/unsubscribe.$token'
 import { Route as ApiPublicUnsubscribeRouteImport } from './routes/api/public/unsubscribe'
 import { Route as ApiPublicJobsSendBatchRouteImport } from './routes/api/public/jobs/send-batch'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UnsubscribeTokenRoute = UnsubscribeTokenRouteImport.update({
+  id: '/unsubscribe/$token',
+  path: '/unsubscribe/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicUnsubscribeRoute = ApiPublicUnsubscribeRouteImport.update({
@@ -31,31 +43,54 @@ const ApiPublicJobsSendBatchRoute = ApiPublicJobsSendBatchRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/unsubscribe/$token': typeof UnsubscribeTokenRoute
   '/api/public/unsubscribe': typeof ApiPublicUnsubscribeRoute
   '/api/public/jobs/send-batch': typeof ApiPublicJobsSendBatchRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/unsubscribe/$token': typeof UnsubscribeTokenRoute
   '/api/public/unsubscribe': typeof ApiPublicUnsubscribeRoute
   '/api/public/jobs/send-batch': typeof ApiPublicJobsSendBatchRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/unsubscribe/$token': typeof UnsubscribeTokenRoute
   '/api/public/unsubscribe': typeof ApiPublicUnsubscribeRoute
   '/api/public/jobs/send-batch': typeof ApiPublicJobsSendBatchRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/api/public/unsubscribe' | '/api/public/jobs/send-batch'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/unsubscribe/$token'
+    | '/api/public/unsubscribe'
+    | '/api/public/jobs/send-batch'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/public/unsubscribe' | '/api/public/jobs/send-batch'
+  to:
+    | '/'
+    | '/auth'
+    | '/unsubscribe/$token'
+    | '/api/public/unsubscribe'
+    | '/api/public/jobs/send-batch'
   id:
-    '__root__' | '/' | '/api/public/unsubscribe' | '/api/public/jobs/send-batch'
+    | '__root__'
+    | '/'
+    | '/auth'
+    | '/unsubscribe/$token'
+    | '/api/public/unsubscribe'
+    | '/api/public/jobs/send-batch'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthRoute: typeof AuthRoute
+  UnsubscribeTokenRoute: typeof UnsubscribeTokenRoute
   ApiPublicUnsubscribeRoute: typeof ApiPublicUnsubscribeRoute
   ApiPublicJobsSendBatchRoute: typeof ApiPublicJobsSendBatchRoute
 }
@@ -67,6 +102,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/unsubscribe/$token': {
+      id: '/unsubscribe/$token'
+      path: '/unsubscribe/$token'
+      fullPath: '/unsubscribe/$token'
+      preLoaderRoute: typeof UnsubscribeTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/unsubscribe': {
@@ -88,6 +137,8 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthRoute: AuthRoute,
+  UnsubscribeTokenRoute: UnsubscribeTokenRoute,
   ApiPublicUnsubscribeRoute: ApiPublicUnsubscribeRoute,
   ApiPublicJobsSendBatchRoute: ApiPublicJobsSendBatchRoute,
 }
