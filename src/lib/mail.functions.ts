@@ -63,7 +63,7 @@ export const sendTestEmail = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const { buildRawEmail, sendGmail } = await import("./gmail.server");
-    const { composeEmail, unsubscribeLinks } = await import("./sender.server");
+    const { composeEmail, unsubscribeLinks } = await import("./compose");
     const { supabase, userId } = context;
     const [{ data: campaign }, { data: account }, { data: settings }] = await Promise.all([
       supabase.from("campaigns").select("*").eq("id", data.campaignId).single(),

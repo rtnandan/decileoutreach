@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as UnsubscribeTokenRouteImport } from './routes/unsubscribe.$token'
 import { Route as AuthenticatedLeadsIndexRouteImport } from './routes/_authenticated/leads/index'
+import { Route as AuthenticatedLeadsLeadIdRouteImport } from './routes/_authenticated/leads/$leadId'
 import { Route as AuthenticatedLeadsImportRouteImport } from './routes/_authenticated/leads/import'
 import { Route as ApiPublicUnsubscribeRouteImport } from './routes/api/public/unsubscribe'
 import { Route as ApiPublicJobsSendBatchRouteImport } from './routes/api/public/jobs/send-batch'
@@ -48,6 +49,12 @@ const AuthenticatedLeadsIndexRoute = AuthenticatedLeadsIndexRouteImport.update({
   path: '/leads/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedLeadsLeadIdRoute =
+  AuthenticatedLeadsLeadIdRouteImport.update({
+    id: '/leads/$leadId',
+    path: '/leads/$leadId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedLeadsImportRoute =
   AuthenticatedLeadsImportRouteImport.update({
     id: '/leads/import',
@@ -70,6 +77,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/unsubscribe/$token': typeof UnsubscribeTokenRoute
+  '/leads/$leadId': typeof AuthenticatedLeadsLeadIdRoute
   '/leads/import': typeof AuthenticatedLeadsImportRoute
   '/api/public/unsubscribe': typeof ApiPublicUnsubscribeRoute
   '/leads/': typeof AuthenticatedLeadsIndexRoute
@@ -80,6 +88,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/unsubscribe/$token': typeof UnsubscribeTokenRoute
+  '/leads/$leadId': typeof AuthenticatedLeadsLeadIdRoute
   '/leads/import': typeof AuthenticatedLeadsImportRoute
   '/api/public/unsubscribe': typeof ApiPublicUnsubscribeRoute
   '/leads': typeof AuthenticatedLeadsIndexRoute
@@ -92,6 +101,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/unsubscribe/$token': typeof UnsubscribeTokenRoute
+  '/_authenticated/leads/$leadId': typeof AuthenticatedLeadsLeadIdRoute
   '/_authenticated/leads/import': typeof AuthenticatedLeadsImportRoute
   '/api/public/unsubscribe': typeof ApiPublicUnsubscribeRoute
   '/_authenticated/leads/': typeof AuthenticatedLeadsIndexRoute
@@ -104,6 +114,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/dashboard'
     | '/unsubscribe/$token'
+    | '/leads/$leadId'
     | '/leads/import'
     | '/api/public/unsubscribe'
     | '/leads/'
@@ -114,6 +125,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/dashboard'
     | '/unsubscribe/$token'
+    | '/leads/$leadId'
     | '/leads/import'
     | '/api/public/unsubscribe'
     | '/leads'
@@ -125,6 +137,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/dashboard'
     | '/unsubscribe/$token'
+    | '/_authenticated/leads/$leadId'
     | '/_authenticated/leads/import'
     | '/api/public/unsubscribe'
     | '/_authenticated/leads/'
@@ -184,6 +197,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLeadsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/leads/$leadId': {
+      id: '/_authenticated/leads/$leadId'
+      path: '/leads/$leadId'
+      fullPath: '/leads/$leadId'
+      preLoaderRoute: typeof AuthenticatedLeadsLeadIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/leads/import': {
       id: '/_authenticated/leads/import'
       path: '/leads/import'
@@ -210,12 +230,14 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedLeadsLeadIdRoute: typeof AuthenticatedLeadsLeadIdRoute
   AuthenticatedLeadsImportRoute: typeof AuthenticatedLeadsImportRoute
   AuthenticatedLeadsIndexRoute: typeof AuthenticatedLeadsIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedLeadsLeadIdRoute: AuthenticatedLeadsLeadIdRoute,
   AuthenticatedLeadsImportRoute: AuthenticatedLeadsImportRoute,
   AuthenticatedLeadsIndexRoute: AuthenticatedLeadsIndexRoute,
 }

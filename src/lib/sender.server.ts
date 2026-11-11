@@ -2,35 +2,12 @@
 // and by the "Send next batch now" button (one owner, RLS client).
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
-import { DO_NOT_EMAIL_STATUSES, renderTemplate } from "./email-utils";
+import { DO_NOT_EMAIL_STATUSES } from "./email-utils";
+import { composeEmail, unsubscribeLinks } from "./compose";
 import { assignAccounts, remainingAllowance, SENDS_PER_RUN, startOfDayInTimeZone } from "./sending-rules";
 import { buildRawEmail, GmailError, sendGmail } from "./gmail.server";
 
 type DB = SupabaseClient<Database>;
-
-export const DEFAULT_APP_URL = "https://project--83ce1671-034f-454b-a1a5-f56180658935.lovable.app";
-
-export function composeEmail(opts: {
-  subject: string;
-  body: string;
-  signature?: string;
-  lead: Parameters<typeof renderTemplate>[1];
-  unsubscribeUrl?: string;
-}) {
-  const subject = renderTemplate(opts.subject, opts.lead);
-  let body = renderTemplate(opts.body, opts.lead).trimEnd();
-  if (opts.signature?.trim()) body += `\n\n${renderTemplate(opts.signature, opts.lead).trim()}`;
-  if (opts.unsubscribeUrl) body += `\n\n--\nNot relevant? Unsubscribe here: ${opts.unsubscribeUrl}`;
-  return { subject, body };
-}
-
-export function unsubscribeLinks(appUrl: string | null | undefined, token: string) {
-  const base = (appUrl || DEFAULT_APP_URL).replace(/\/+$/, "");
-  return {
-    page: `${base}/unsubscribe/${token}`,
-    oneClick: `${base}/api/public/unsubscribe?t=${token}`,
-  };
-}
 
 export type RunResult = { sent: number; skipped: number; failed: number; notes: string[] };
 
