@@ -138,14 +138,16 @@ export async function runSender(db: DB, opts: { ownerId?: string; maxSends?: num
     // Claim each row atomically: only rows still "queued" move to "sending".
     for (let i = 0; i < queued.length; i++) {
       const accountId = plan[i];
+      const row = queued[i];
+      if (!accountId || !row) continue;
       const { data: claimed } = await db
         .from("campaign_leads")
         .update({ status: "sending", claimed_at: new Date().toISOString(), sending_account_id: accountId })
-        .eq("id", queued[i].id)
+        .eq("id", row.id)
         .eq("status", "queued")
         .select("id");
       if (claimed?.length) {
-        tasks.push({ campaign, clId: queued[i].id, accountId });
+        tasks.push({ campaign, clId: row.id, accountId });
         accountSent.set(accountId, (accountSent.get(accountId) ?? 0) + 1);
         campaignSent.set(campaign.id, (campaignSent.get(campaign.id) ?? 0) + 1);
         slots--;

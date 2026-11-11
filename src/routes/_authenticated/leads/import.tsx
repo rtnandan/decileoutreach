@@ -54,11 +54,13 @@ function ImportPage() {
     try {
       const XLSX = await import("xlsx");
       const wb = XLSX.read(await file.arrayBuffer(), { type: "array" });
-      const sheet = wb.Sheets[wb.SheetNames[0]];
+      const firstName = wb.SheetNames[0];
+      const sheet = firstName ? wb.Sheets[firstName] : undefined;
+      if (!sheet) throw new Error("The file has no sheets");
       const json = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, { defval: "", raw: false });
       if (!json.length) throw new Error("The file has no rows");
       if (json.length > MAX_ROWS) throw new Error(`Please split the file — max ${MAX_ROWS.toLocaleString()} rows at a time`);
-      const hs = Object.keys(json[0]);
+      const hs = Object.keys(json[0] ?? {});
       const m: Record<string, ImportTarget> = {};
       hs.forEach((h) => (m[h] = guessTarget(h)));
       setFileName(file.name);
@@ -155,7 +157,7 @@ function ImportPage() {
                   <div className="truncate font-medium">{h}</div>
                   <div className="truncate text-xs text-muted-foreground">e.g. {String(rows[0]?.[h] ?? "") || "—"}</div>
                 </div>
-                <Select value={mapping[h]} onValueChange={(v) => { setMapping({ ...mapping, [h]: v as ImportTarget }); setCheck(null); }}>
+                <Select value={mapping[h] ?? "custom"} onValueChange={(v) => { setMapping({ ...mapping, [h]: v as ImportTarget }); setCheck(null); }}>
                   <SelectTrigger className="md:w-60">
                     <SelectValue />
                   </SelectTrigger>

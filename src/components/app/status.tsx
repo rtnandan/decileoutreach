@@ -13,7 +13,7 @@ const CAMPAIGN: Record<string, { label: string; tone: "neutral" | "success" | "w
   completed: { label: "Completed", tone: "info" },
 };
 export function CampaignStatusBadge({ status }: { status: string }) {
-  const m = CAMPAIGN[status] ?? CAMPAIGN.draft;
+  const m = CAMPAIGN[status] ?? { label: "Draft", tone: "neutral" as const };
   return <Badge variant={m.tone}>{m.label}</Badge>;
 }
 
@@ -28,7 +28,7 @@ const RECIPIENT: Record<string, { label: string; tone: "neutral" | "success" | "
   received: { label: "Received", tone: "info" },
 };
 export function DeliveryBadge({ status }: { status: string }) {
-  const m = RECIPIENT[status] ?? RECIPIENT.queued;
+  const m = RECIPIENT[status] ?? { label: "Queued", tone: "neutral" as const };
   return <Badge variant={m.tone}>{m.label}</Badge>;
 }
 
@@ -39,6 +39,6 @@ const ACCOUNT: Record<string, { label: string; tone: "success" | "warning" | "da
   rate_limited: { label: "Limit reached", tone: "warning" },
 };
 export function AccountStatusBadge({ status }: { status: string }) {
-  const m = ACCOUNT[status] ?? ACCOUNT.active;
+  const m = ACCOUNT[status] ?? { label: "Healthy", tone: "success" as const };
   return <Badge variant={m.tone}>{m.label}</Badge>;
 }

@@ -30,10 +30,10 @@ export const Route = createFileRoute("/_authenticated/leads/")({
     ],
   }),
   validateSearch: (s: Record<string, unknown>): LeadsSearch => ({
-    q: typeof s.q === "string" && s.q ? s.q : undefined,
-    status: typeof s.status === "string" && s.status ? s.status : undefined,
-    sort: SORTS.includes(s.sort as never) ? (s.sort as LeadsSearch["sort"]) : undefined,
-    page: Number(s.page) > 1 ? Number(s.page) : undefined,
+    q: typeof s["q"] === "string" && s["q"] ? s["q"] : undefined,
+    status: typeof s["status"] === "string" && s["status"] ? s["status"] : undefined,
+    sort: SORTS.find((x) => x === s["sort"]),
+    page: Number(s["page"]) > 1 ? Number(s["page"]) : undefined,
   }),
   loaderDeps: ({ search }) => search,
   loader: ({ context, deps }) => context.queryClient.ensureQueryData(leadsQuery(deps)),
@@ -70,7 +70,7 @@ function LeadsPage() {
   async function deleteSelected() {
     if (!confirm(`Delete ${selected.size} lead(s)? Their email history will also be removed.`)) return;
     const { error } = await supabase.from("leads").delete().in("id", [...selected]);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success("Deleted");
     setSelected(new Set());
     qc.invalidateQueries();

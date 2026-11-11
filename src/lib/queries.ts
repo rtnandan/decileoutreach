@@ -3,15 +3,21 @@ import { supabase } from "@/integrations/supabase/client";
 import { startOfDayInTimeZone } from "./sending-rules";
 
 export type LeadsSearch = {
-  q?: string;
-  status?: string;
-  sort?: "newest" | "oldest" | "name" | "company" | "last_contacted";
-  page?: number;
+  q?: string | undefined;
+  status?: string | undefined;
+  sort?: "newest" | "oldest" | "name" | "company" | "last_contacted" | undefined;
+  page?: number | undefined;
 };
 
 export const PAGE_SIZE = 50;
 
-function ok<T>(res: { data: T; error: { message: string } | null }): T {
+function ok<T>(res: { data: T; error: { message: string } | null }): NonNullable<T> {
+  if (res.error) throw new Error(res.error.message);
+  if (res.data == null) throw new Error("Not found");
+  return res.data as NonNullable<T>;
+}
+
+function okMaybe<T>(res: { data: T; error: { message: string } | null }): T {
   if (res.error) throw new Error(res.error.message);
   return res.data;
 }
@@ -30,7 +36,7 @@ export const dashboardQuery = () =>
 export const settingsQuery = () =>
   queryOptions({
     queryKey: ["settings"],
-    queryFn: async () => ok(await supabase.from("app_settings").select("*").maybeSingle()),
+    queryFn: async () => okMaybe(await supabase.from("app_settings").select("*").maybeSingle()),
   });
 
 export const accountsQuery = () =>
@@ -38,7 +44,7 @@ export const accountsQuery = () =>
     queryKey: ["accounts"],
     queryFn: async () => {
       const accounts = ok(await supabase.from("sending_accounts").select("*").order("created_at"));
-      const settings = ok(await supabase.from("app_settings").select("timezone").maybeSingle());
+      const settings = okMaybe(await supabase.from("app_settings").select("timezone").maybeSingle());
       const since = startOfDayInTimeZone(new Date(), settings?.timezone ?? "Asia/Kolkata");
       const counts = ok(await supabase.rpc("get_sent_counts_since", { _since: since.toISOString() }));
       const sentToday = new Map<string, number>();

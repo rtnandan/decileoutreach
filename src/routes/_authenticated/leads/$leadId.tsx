@@ -42,19 +42,25 @@ function LeadPage() {
   const { lead, messages, enrolments } = data;
   const qc = useQueryClient();
   const navigate = useNavigate();
-  const [form, setForm] = useState(() => Object.fromEntries(EDITABLE.map(([k]) => [k, lead[k] ?? ""])));
+  const [form, setForm] = useState({
+    first_name: lead.first_name,
+    last_name: lead.last_name,
+    company: lead.company,
+    designation: lead.designation,
+    industry: lead.industry,
+  });
   const custom = (lead.custom_fields ?? {}) as Record<string, string>;
 
   async function save() {
     const { error } = await supabase.from("leads").update(form).eq("id", lead.id);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success("Saved");
     qc.invalidateQueries();
   }
 
   async function setStatus(status: string) {
     const { error } = await supabase.from("leads").update({ status }).eq("id", lead.id);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     if (status === "unsubscribed" || status === "bounced") {
       await supabase.from("campaign_leads").update({ status: "skipped", error: `Lead ${status}` }).eq("lead_id", lead.id).eq("status", "queued");
     }
@@ -65,7 +71,7 @@ function LeadPage() {
     const { error } = await supabase
       .from("suppressions")
       .upsert({ email: lead.email, reason: "manual", note: "Added from lead page" }, { onConflict: "owner_id,email", ignoreDuplicates: true });
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     await setStatus("unsubscribed");
     toast.success("Added to suppression list");
   }
@@ -73,7 +79,7 @@ function LeadPage() {
   async function remove() {
     if (!confirm("Delete this lead and its email history?")) return;
     const { error } = await supabase.from("leads").delete().eq("id", lead.id);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     qc.invalidateQueries();
     navigate({ to: "/leads" });
   }

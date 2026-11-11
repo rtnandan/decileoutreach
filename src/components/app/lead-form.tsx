@@ -18,13 +18,13 @@ const FIELDS = [
 
 export function AddLeadDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (v: boolean) => void }) {
   const qc = useQueryClient();
-  const [form, setForm] = useState<Record<string, string>>({});
+  const [form, setForm] = useState<Partial<Record<"email" | (typeof FIELDS)[number][0], string>>>({});
   const [busy, setBusy] = useState(false);
 
   async function save(e: React.FormEvent) {
     e.preventDefault();
     const email = normalizeEmail(form.email ?? "");
-    if (!isValidEmail(email)) return toast.error("Please enter a valid email address");
+    if (!isValidEmail(email)) { toast.error("Please enter a valid email address"); return; }
     setBusy(true);
     const { data: suppressed } = await supabase.from("suppressions").select("id").eq("email", email).maybeSingle();
     const { error } = await supabase.from("leads").insert({
@@ -39,7 +39,7 @@ export function AddLeadDialog({ open, onOpenChange }: { open: boolean; onOpenCha
     });
     setBusy(false);
     if (error) {
-      return toast.error(error.code === "23505" ? "A lead with this email already exists" : error.message);
+      { toast.error(error.code === "23505" ? "A lead with this email already exists" : error.message); return; }
     }
     toast.success("Lead added", { description: suppressed ? "This email is on your suppression list, so it won't be emailed." : undefined });
     setForm({});
