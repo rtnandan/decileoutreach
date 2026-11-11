@@ -60,3 +60,19 @@ describe("daily limits", () => {
     );
   });
 });
+
+import { guessTarget, mapRow } from "./import-mapping";
+describe("import mapping", () => {
+  it("recognises common column names", () => {
+    expect(guessTarget("Email Address")).toBe("email");
+    expect(guessTarget("Job Title")).toBe("designation");
+    expect(guessTarget("Company Name")).toBe("company");
+    expect(guessTarget("LinkedIn")).toBe("custom");
+  });
+  it("splits full names and keeps custom fields", () => {
+    const r = mapRow({ Name: "Ravi Kumar Shah", City: "Pune" }, { Name: "full_name", City: "custom" }, 0);
+    expect(r.first_name).toBe("Ravi");
+    expect(r.last_name).toBe("Kumar Shah");
+    expect(r.custom_fields).toEqual({ city: "Pune" });
+  });
+});
