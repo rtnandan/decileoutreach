@@ -5,9 +5,9 @@ export const DEFAULT_APP_URL = "https://project--83ce1671-034f-454b-a1a5-f561806
 export function composeEmail(opts: {
   subject: string;
   body: string;
-  signature?: string | null;
+  signature?: string | null | undefined;
   lead: LeadLike;
-  unsubscribeUrl?: string;
+  unsubscribeUrl?: string | undefined;
 }) {
   const subject = renderTemplate(opts.subject, opts.lead);
   let body = renderTemplate(opts.body, opts.lead).trimEnd();

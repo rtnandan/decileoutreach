@@ -42,7 +42,13 @@ function LeadPage() {
   const { lead, messages, enrolments } = data;
   const qc = useQueryClient();
   const navigate = useNavigate();
-  const [form, setForm] = useState(() => Object.fromEntries(EDITABLE.map(([k]) => [k, lead[k] ?? ""])));
+  const [form, setForm] = useState({
+    first_name: lead.first_name,
+    last_name: lead.last_name,
+    company: lead.company,
+    designation: lead.designation,
+    industry: lead.industry,
+  });
   const custom = (lead.custom_fields ?? {}) as Record<string, string>;
 
   async function save() {

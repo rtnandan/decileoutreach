@@ -86,7 +86,7 @@ export const sendTestEmail = createServerFn({ method: "POST" })
       const { data: l } = await supabase.from("leads").select("*").eq("id", data.leadId).single();
       if (l) lead = l as unknown as Record<string, unknown>;
     }
-    const links = unsubscribeLinks(settings?.app_url, String(lead.unsubscribe_token));
+    const links = unsubscribeLinks(settings?.app_url, String(lead["unsubscribe_token"]));
     const { subject, body } = composeEmail({
       subject: campaign.subject,
       body: campaign.body,
