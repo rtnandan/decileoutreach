@@ -105,40 +105,40 @@ export const leadQuery = (id: string) =>
     },
   });
 
-export const campaignsQuery = () =>
-  queryOptions({
-    queryKey: ["campaigns"],
-    queryFn: async () => {
-      const campaigns = ok(await supabase.from("campaigns").select("*").order("created_at", { ascending: false }));
-      const stats = ok(await supabase.rpc("get_campaign_stats"));
-      const byId = new Map((stats ?? []).map((s) => [s.campaign_id, s]));
-      return campaigns.map((c) => {
-        const s = byId.get(c.id);
-        return {
-          ...c,
-          stats: {
-            total: Number(s?.total ?? 0),
-            queued: Number(s?.queued ?? 0),
-            sending: Number(s?.sending ?? 0),
-            sent: Number(s?.sent ?? 0),
-            failed: Number(s?.failed ?? 0),
-            skipped: Number(s?.skipped ?? 0),
-          },
-        };
-      });
-    },
+async function fetchCampaigns(id?: string) {
+  let q = supabase.from("campaigns").select("*").order("created_at", { ascending: false });
+  if (id) q = q.eq("id", id);
+  const campaigns = ok(await q);
+  const stats = ok(await supabase.rpc("get_campaign_stats"));
+  const byId = new Map((stats ?? []).map((s) => [s.campaign_id, s]));
+  return campaigns.map((c) => {
+    const s = byId.get(c.id);
+    return {
+      ...c,
+      stats: {
+        total: Number(s?.total ?? 0),
+        queued: Number(s?.queued ?? 0),
+        sending: Number(s?.sending ?? 0),
+        sent: Number(s?.sent ?? 0),
+        failed: Number(s?.failed ?? 0),
+        skipped: Number(s?.skipped ?? 0),
+      },
+    };
   });
+}
+
+export type CampaignWithStats = Awaited<ReturnType<typeof fetchCampaigns>>[number];
+
+export const campaignsQuery = () =>
+  queryOptions({ queryKey: ["campaigns"], queryFn: () => fetchCampaigns() });
 
 export const campaignQuery = (id: string) =>
   queryOptions({
     queryKey: ["campaign", id],
     queryFn: async () => {
-      const all = await campaignsQuery().queryFn!({} as never);
-      const campaign = (all as Awaited<ReturnType<NonNullable<ReturnType<typeof campaignsQuery>["queryFn"]>>>).find(
-        (c) => c.id === id,
-      );
-      if (!campaign) throw new Error("Campaign not found");
-      return campaign;
+      const [c] = await fetchCampaigns(id);
+      if (!c) throw new Error("Campaign not found");
+      return c;
     },
   });
 
