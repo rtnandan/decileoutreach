@@ -10,33 +10,147 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as UnsubscribeTokenRouteImport } from './routes/unsubscribe.$token'
+import { Route as AuthenticatedLeadsIndexRouteImport } from './routes/_authenticated/leads/index'
+import { Route as AuthenticatedLeadsLeadIdRouteImport } from './routes/_authenticated/leads/$leadId'
+import { Route as AuthenticatedLeadsImportRouteImport } from './routes/_authenticated/leads/import'
+import { Route as ApiPublicUnsubscribeRouteImport } from './routes/api/public/unsubscribe'
+import { Route as ApiPublicJobsSendBatchRouteImport } from './routes/api/public/jobs/send-batch'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const UnsubscribeTokenRoute = UnsubscribeTokenRouteImport.update({
+  id: '/unsubscribe/$token',
+  path: '/unsubscribe/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedLeadsIndexRoute = AuthenticatedLeadsIndexRouteImport.update({
+  id: '/leads/',
+  path: '/leads/',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedLeadsLeadIdRoute =
+  AuthenticatedLeadsLeadIdRouteImport.update({
+    id: '/leads/$leadId',
+    path: '/leads/$leadId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedLeadsImportRoute =
+  AuthenticatedLeadsImportRouteImport.update({
+    id: '/leads/import',
+    path: '/leads/import',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const ApiPublicUnsubscribeRoute = ApiPublicUnsubscribeRouteImport.update({
+  id: '/api/public/unsubscribe',
+  path: '/api/public/unsubscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicJobsSendBatchRoute = ApiPublicJobsSendBatchRouteImport.update({
+  id: '/api/public/jobs/send-batch',
+  path: '/api/public/jobs/send-batch',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/unsubscribe/$token': typeof UnsubscribeTokenRoute
+  '/leads/$leadId': typeof AuthenticatedLeadsLeadIdRoute
+  '/leads/import': typeof AuthenticatedLeadsImportRoute
+  '/api/public/unsubscribe': typeof ApiPublicUnsubscribeRoute
+  '/leads/': typeof AuthenticatedLeadsIndexRoute
+  '/api/public/jobs/send-batch': typeof ApiPublicJobsSendBatchRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/unsubscribe/$token': typeof UnsubscribeTokenRoute
+  '/leads/$leadId': typeof AuthenticatedLeadsLeadIdRoute
+  '/leads/import': typeof AuthenticatedLeadsImportRoute
+  '/api/public/unsubscribe': typeof ApiPublicUnsubscribeRoute
+  '/leads': typeof AuthenticatedLeadsIndexRoute
+  '/api/public/jobs/send-batch': typeof ApiPublicJobsSendBatchRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/unsubscribe/$token': typeof UnsubscribeTokenRoute
+  '/_authenticated/leads/$leadId': typeof AuthenticatedLeadsLeadIdRoute
+  '/_authenticated/leads/import': typeof AuthenticatedLeadsImportRoute
+  '/api/public/unsubscribe': typeof ApiPublicUnsubscribeRoute
+  '/_authenticated/leads/': typeof AuthenticatedLeadsIndexRoute
+  '/api/public/jobs/send-batch': typeof ApiPublicJobsSendBatchRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/dashboard'
+    | '/unsubscribe/$token'
+    | '/leads/$leadId'
+    | '/leads/import'
+    | '/api/public/unsubscribe'
+    | '/leads/'
+    | '/api/public/jobs/send-batch'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/auth'
+    | '/dashboard'
+    | '/unsubscribe/$token'
+    | '/leads/$leadId'
+    | '/leads/import'
+    | '/api/public/unsubscribe'
+    | '/leads'
+    | '/api/public/jobs/send-batch'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/_authenticated/dashboard'
+    | '/unsubscribe/$token'
+    | '/_authenticated/leads/$leadId'
+    | '/_authenticated/leads/import'
+    | '/api/public/unsubscribe'
+    | '/_authenticated/leads/'
+    | '/api/public/jobs/send-batch'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
+  UnsubscribeTokenRoute: typeof UnsubscribeTokenRoute
+  ApiPublicUnsubscribeRoute: typeof ApiPublicUnsubscribeRoute
+  ApiPublicJobsSendBatchRoute: typeof ApiPublicJobsSendBatchRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +162,96 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/unsubscribe/$token': {
+      id: '/unsubscribe/$token'
+      path: '/unsubscribe/$token'
+      fullPath: '/unsubscribe/$token'
+      preLoaderRoute: typeof UnsubscribeTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/leads/': {
+      id: '/_authenticated/leads/'
+      path: '/leads'
+      fullPath: '/leads/'
+      preLoaderRoute: typeof AuthenticatedLeadsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/leads/$leadId': {
+      id: '/_authenticated/leads/$leadId'
+      path: '/leads/$leadId'
+      fullPath: '/leads/$leadId'
+      preLoaderRoute: typeof AuthenticatedLeadsLeadIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/leads/import': {
+      id: '/_authenticated/leads/import'
+      path: '/leads/import'
+      fullPath: '/leads/import'
+      preLoaderRoute: typeof AuthenticatedLeadsImportRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/api/public/unsubscribe': {
+      id: '/api/public/unsubscribe'
+      path: '/api/public/unsubscribe'
+      fullPath: '/api/public/unsubscribe'
+      preLoaderRoute: typeof ApiPublicUnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/jobs/send-batch': {
+      id: '/api/public/jobs/send-batch'
+      path: '/api/public/jobs/send-batch'
+      fullPath: '/api/public/jobs/send-batch'
+      preLoaderRoute: typeof ApiPublicJobsSendBatchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedLeadsLeadIdRoute: typeof AuthenticatedLeadsLeadIdRoute
+  AuthenticatedLeadsImportRoute: typeof AuthenticatedLeadsImportRoute
+  AuthenticatedLeadsIndexRoute: typeof AuthenticatedLeadsIndexRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedLeadsLeadIdRoute: AuthenticatedLeadsLeadIdRoute,
+  AuthenticatedLeadsImportRoute: AuthenticatedLeadsImportRoute,
+  AuthenticatedLeadsIndexRoute: AuthenticatedLeadsIndexRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
+  UnsubscribeTokenRoute: UnsubscribeTokenRoute,
+  ApiPublicUnsubscribeRoute: ApiPublicUnsubscribeRoute,
+  ApiPublicJobsSendBatchRoute: ApiPublicJobsSendBatchRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

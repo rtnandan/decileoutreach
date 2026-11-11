@@ -385,6 +385,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      enroll_leads: {
+        Args: {
+          _campaign_id: string
+          _lead_ids?: string[]
+          _skip_contacted?: boolean
+          _statuses?: string[]
+        }
+        Returns: number
+      }
       get_campaign_stats: {
         Args: never
         Returns: {
