@@ -45,7 +45,8 @@ export const Route = createFileRoute("/api/public/unsubscribe")({
         if (!parsed.success) return Response.json({ ok: false }, { status: 400 });
         const ok = await unsubscribe(parsed.data);
         // Same response either way: don't reveal whether a token exists.
-        return Response.json({ ok: true, done: ok });
+        void ok;
+        return Response.json({ ok: true });
       },
     },
   },
