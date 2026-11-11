@@ -62,7 +62,7 @@ export function mapRow(row: Record<string, unknown>, mapping: Record<string, Imp
     if (target === "custom") out.custom_fields[customKey(header)] = v;
     else if (target === "full_name") {
       const [first, ...rest] = v.split(/\s+/);
-      if (!out.first_name) out.first_name = first;
+      if (!out.first_name) out.first_name = first ?? "";
       if (!out.last_name) out.last_name = rest.join(" ");
     } else out[target] = v;
   }

@@ -35,7 +35,7 @@ export function AddToCampaignDialog({
       _skip_contacted: skipContacted,
     });
     setBusy(false);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     const added = Number(data ?? 0);
     toast.success(`${added} added`, {
       description: added < leadIds.length ? `${leadIds.length - added} skipped (already added, contacted, unsubscribed or bounced)` : undefined,

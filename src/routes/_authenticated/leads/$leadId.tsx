@@ -47,14 +47,14 @@ function LeadPage() {
 
   async function save() {
     const { error } = await supabase.from("leads").update(form).eq("id", lead.id);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success("Saved");
     qc.invalidateQueries();
   }
 
   async function setStatus(status: string) {
     const { error } = await supabase.from("leads").update({ status }).eq("id", lead.id);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     if (status === "unsubscribed" || status === "bounced") {
       await supabase.from("campaign_leads").update({ status: "skipped", error: `Lead ${status}` }).eq("lead_id", lead.id).eq("status", "queued");
     }
@@ -65,7 +65,7 @@ function LeadPage() {
     const { error } = await supabase
       .from("suppressions")
       .upsert({ email: lead.email, reason: "manual", note: "Added from lead page" }, { onConflict: "owner_id,email", ignoreDuplicates: true });
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     await setStatus("unsubscribed");
     toast.success("Added to suppression list");
   }
@@ -73,7 +73,7 @@ function LeadPage() {
   async function remove() {
     if (!confirm("Delete this lead and its email history?")) return;
     const { error } = await supabase.from("leads").delete().eq("id", lead.id);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     qc.invalidateQueries();
     navigate({ to: "/leads" });
   }

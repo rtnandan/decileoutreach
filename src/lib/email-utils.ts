@@ -83,14 +83,15 @@ export function renderTemplate(template: string, lead: LeadLike): string {
 export function missingVariables(template: string, lead: LeadLike): string[] {
   const missing = new Set<string>();
   for (const m of template.matchAll(VAR_RE)) {
-    const [, key, fallback] = m;
+    const key = m[1] ?? "";
+    const fallback = m[2];
     if (!lookup(lead, key) && fallback === undefined) missing.add(key);
   }
   return [...missing];
 }
 
 export function variablesIn(template: string): string[] {
-  return [...new Set([...template.matchAll(VAR_RE)].map((m) => m[1]))];
+  return [...new Set([...template.matchAll(VAR_RE)].map((m) => m[1] ?? ""))];
 }
 
 /** Splits rows into new, invalid, duplicate-in-file and already-existing. */
