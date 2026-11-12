@@ -128,5 +128,14 @@ export const sendNextBatchNow = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { runSender } = await import("./sender.server");
-    return runSender(context.supabase, { ownerId: context.userId });
+    const { MANUAL_BATCH_SIZE } = await import("./sending-rules");
+    return runSender(context.supabase, { ownerId: context.userId, maxSends: MANUAL_BATCH_SIZE });
+  });
+
+/** Looks for bounce notices in the connected Gmail inboxes right now. */
+export const checkBouncesNow = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { processBounces } = await import("./bounces.server");
+    return processBounces(context.supabase, { ownerId: context.userId });
   });

@@ -62,6 +62,11 @@ export function assignAccounts(
   return out;
 }
 
-/** Emails per scheduled run and runs per hour (every 5 minutes). */
-export const SENDS_PER_RUN = 5;
-export const RUNS_PER_HOUR = 12;
+/**
+ * The schedule runs every minute and sends one email per run: a steady, human-like pace
+ * (about 60/hour) that also keeps each run well inside the scheduler's time limit.
+ */
+export const SENDS_PER_RUN = 1;
+export const RUNS_PER_HOUR = 60;
+/** "Send next batch now" may send a few at once, since it isn't bound by the scheduler. */
+export const MANUAL_BATCH_SIZE = 5;

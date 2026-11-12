@@ -56,34 +56,10 @@ export async function getGmailProfile(secretName: string): Promise<{ emailAddres
   return gmailFetch(secretName, "/users/me/profile");
 }
 
-const b64 = (s: string) =>
-  btoa(Array.from(new TextEncoder().encode(s), (b) => String.fromCharCode(b)).join(""));
-const encodeHeader = (v: string) => (/^[\x00-\x7F]*$/.test(v) ? v : `=?UTF-8?B?${b64(v)}?=`);
-const stripNewlines = (v: string) => v.replace(/[\r\n]+/g, " ").trim();
+import { b64, buildMimeMessage } from "./mime";
 
-export function buildRawEmail(input: {
-  from: string;
-  fromName?: string;
-  to: string;
-  subject: string;
-  body: string;
-  unsubscribeUrl?: string;
-}) {
-  const fromName = stripNewlines(input.fromName ?? "");
-  const lines = [
-    `From: ${fromName ? `${encodeHeader(`"${fromName.replace(/"/g, "")}"`)} <${input.from}>` : input.from}`,
-    `To: ${stripNewlines(input.to)}`,
-    `Subject: ${encodeHeader(stripNewlines(input.subject))}`,
-    "MIME-Version: 1.0",
-    'Content-Type: text/plain; charset="UTF-8"',
-    "Content-Transfer-Encoding: 8bit",
-  ];
-  if (input.unsubscribeUrl) {
-    lines.push(`List-Unsubscribe: <${input.unsubscribeUrl}>`);
-    lines.push("List-Unsubscribe-Post: List-Unsubscribe=One-Click");
-  }
-  const message = [...lines, "", input.body.replace(/\r?\n/g, "\r\n")].join("\r\n");
-  return b64(message).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+export function buildRawEmail(input: Parameters<typeof buildMimeMessage>[0]) {
+  return b64(buildMimeMessage(input)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }
 
 export async function sendGmail(
@@ -95,4 +71,31 @@ export async function sendGmail(
     method: "POST",
     body: JSON.stringify(threadId ? { raw, threadId } : { raw }),
   });
+}
+
+export async function listMessageIds(
+  secretName: string,
+  q: string,
+  maxResults = 50,
+): Promise<{ id: string; threadId: string }[]> {
+  const params = new URLSearchParams({ q, maxResults: String(maxResults) });
+  const res = (await gmailFetch(secretName, `/users/me/messages?${params}`)) as {
+    messages?: { id: string; threadId: string }[];
+  };
+  return res.messages ?? [];
+}
+
+export async function getMessageHeaders(
+  secretName: string,
+  id: string,
+  names: string[],
+): Promise<Record<string, string>> {
+  const params = new URLSearchParams({ format: "metadata" });
+  for (const n of names) params.append("metadataHeaders", n);
+  const res = (await gmailFetch(secretName, `/users/me/messages/${encodeURIComponent(id)}?${params}`)) as {
+    payload?: { headers?: { name: string; value: string }[] };
+  };
+  const out: Record<string, string> = {};
+  for (const h of res.payload?.headers ?? []) out[h.name.toLowerCase()] = h.value;
+  return out;
 }

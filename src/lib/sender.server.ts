@@ -4,7 +4,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 import { DO_NOT_EMAIL_STATUSES } from "./email-utils";
 import { composeEmail, unsubscribeLinks } from "./compose";
-import { assignAccounts, remainingAllowance, SENDS_PER_RUN, startOfDayInTimeZone } from "./sending-rules";
+import { assignAccounts, MANUAL_BATCH_SIZE, remainingAllowance, SENDS_PER_RUN, startOfDayInTimeZone } from "./sending-rules";
 import { buildRawEmail, GmailError, sendGmail } from "./gmail.server";
 
 type DB = SupabaseClient<Database>;
@@ -13,7 +13,7 @@ export type RunResult = { sent: number; skipped: number; failed: number; notes: 
 
 export async function runSender(db: DB, opts: { ownerId?: string; maxSends?: number } = {}): Promise<RunResult> {
   const result: RunResult = { sent: 0, skipped: 0, failed: 0, notes: [] };
-  let slots = Math.min(opts.maxSends ?? SENDS_PER_RUN, SENDS_PER_RUN);
+  let slots = Math.min(opts.maxSends ?? SENDS_PER_RUN, MANUAL_BATCH_SIZE);
   const now = new Date();
 
   // 1. Anything stuck "sending" for 15+ minutes is marked failed, never retried (avoids duplicates).
@@ -155,13 +155,20 @@ export async function runSender(db: DB, opts: { ownerId?: string; maxSends?: num
     }
   }
 
-  // 3. Send (at most 5 at once).
-  await Promise.all(
-    tasks.map(async (t) => {
-      const outcome = await sendOne(db, t.campaign, t.clId, accounts.get(t.accountId)!, settings.get(t.campaign.owner_id));
-      result[outcome]++;
-    }),
-  );
+  // 3. Send one at a time (a steady pace looks natural to inbox providers).
+  for (const t of tasks) {
+    const account = accounts.get(t.accountId)!;
+    if (account.status !== "active") {
+      await db
+        .from("campaign_leads")
+        .update({ status: "queued", claimed_at: null, sending_account_id: null })
+        .eq("id", t.clId)
+        .eq("status", "sending");
+      continue;
+    }
+    const outcome = await sendOne(db, t.campaign, t.clId, account, settings.get(t.campaign.owner_id));
+    result[outcome]++;
+  }
   return result;
 }
 
