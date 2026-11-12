@@ -99,3 +99,12 @@ export async function getMessageHeaders(
   for (const h of res.payload?.headers ?? []) out[h.name.toLowerCase()] = h.value;
   return out;
 }
+
+/** The short preview text Gmail stores for a message (the start of the reply). */
+export async function gmailGetSnippet(secretName: string, id: string): Promise<string> {
+  const params = new URLSearchParams({ format: "minimal", fields: "snippet" });
+  const res = (await gmailFetch(secretName, `/users/me/messages/${encodeURIComponent(id)}?${params}`)) as {
+    snippet?: string;
+  };
+  return res.snippet ?? "";
+}

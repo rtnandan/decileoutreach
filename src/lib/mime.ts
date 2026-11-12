@@ -57,7 +57,6 @@ export function buildMimeMessage(input: {
   to: string;
   subject: string;
   body: string;
-  unsubscribeUrl?: string;
 }): string {
   const name = stripNewlines(input.fromName ?? "").replace(/"/g, "");
   const from = name ? `${isAscii(name) ? `"${name}"` : encodeHeader(name)} <${input.from}>` : input.from;
@@ -69,10 +68,8 @@ export function buildMimeMessage(input: {
     'Content-Type: text/plain; charset="UTF-8"',
     "Content-Transfer-Encoding: quoted-printable",
   ];
-  if (input.unsubscribeUrl) {
-    lines.push(`List-Unsubscribe: <${input.unsubscribeUrl}>`);
-    lines.push("List-Unsubscribe-Post: List-Unsubscribe=One-Click");
-  }
+  // No List-Unsubscribe header on purpose: it marks the email as bulk mail and Gmail files it
+  // under Promotions. The opt-out line in the body is handled by the inbox checker.
   return [...lines, "", encodeQuotedPrintable(input.body)].join("\r\n");
 }
 
@@ -80,4 +77,17 @@ export function buildMimeMessage(input: {
 export function parseFailedRecipients(header: string | null | undefined): string[] {
   if (!header) return [];
   return [...new Set((header.match(/[^\s<>,;"']+@[^\s<>,;"']+/g) ?? []).map((e) => e.toLowerCase()))];
+}
+
+/**
+ * True when a reply asks to stop receiving emails. Looks only at the reply's own words
+ * (Gmail's preview text starts with the new text), so our own P.S. line quoted below doesn't count.
+ */
+export function isOptOutReply(snippet: string): boolean {
+  const text = snippet
+    .replace(/&#39;|&rsquo;/g, "'")
+    .replace(/&quot;/g, '"')
+    .toLowerCase()
+    .split(/\bon .{3,80} wrote:|-----original message-----|p\.s\. if this isn't relevant/)[0] ?? "";
+  return /\b(unsubscribe|opt[ -]?out|remove me|take me off|stop (emailing|sending|contacting)|do not (email|contact)|don't (email|contact)|no more emails)\b/.test(text);
 }
