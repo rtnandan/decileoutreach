@@ -1,6 +1,6 @@
 import { renderTemplate, type LeadLike } from "./email-utils";
 
-export const DEFAULT_APP_URL = "https://project--83ce1671-034f-454b-a1a5-f56180658935.lovable.app";
+export const DEFAULT_APP_URL = "https://decileoutreach.lovable.app";
 
 export function composeEmail(opts: {
   subject: string;
