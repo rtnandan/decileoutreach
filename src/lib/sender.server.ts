@@ -3,7 +3,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 import { DO_NOT_EMAIL_STATUSES } from "./email-utils";
-import { composeEmail, unsubscribeLinks } from "./compose";
+import { composeEmail } from "./compose";
 import { assignAccounts, MANUAL_BATCH_SIZE, remainingAllowance, SENDS_PER_RUN, startOfDayInTimeZone } from "./sending-rules";
 import { buildRawEmail, GmailError, sendGmail } from "./gmail.server";
 
@@ -196,13 +196,12 @@ async function sendOne(
     .maybeSingle();
   if (sup) return skip("On suppression list");
 
-  const links = unsubscribeLinks(settings?.app_url, lead.unsubscribe_token);
   const { subject, body } = composeEmail({
     subject: campaign.subject,
     body: campaign.body,
     signature: settings?.signature,
     lead: { ...lead, custom_fields: (lead.custom_fields ?? {}) as Record<string, unknown> },
-    unsubscribeUrl: links.page,
+    optOut: true,
   });
 
   // The unique (campaign_lead_id, step) index makes a second insert impossible -> no duplicates.
@@ -232,7 +231,6 @@ async function sendOne(
       to: lead.email,
       subject,
       body,
-      unsubscribeUrl: links.oneClick,
     });
     const sent = await sendGmail(account.secret_name, raw);
     const sentAt = new Date().toISOString();

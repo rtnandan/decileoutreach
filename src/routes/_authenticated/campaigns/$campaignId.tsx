@@ -195,7 +195,7 @@ function CampaignPage() {
 
       {campaign.status === "active" && (
         <p className="mt-3 text-xs text-muted-foreground">
-          The sender runs automatically every 5 minutes, up to {SENDS_PER_RUN} emails per run (~{SENDS_PER_RUN * RUNS_PER_HOUR}/hour), within each account's daily limit.
+          The sender sends {SENDS_PER_RUN} email every minute (~{SENDS_PER_RUN * RUNS_PER_HOUR}/hour), within each account's daily limit.
         </p>
       )}
 
@@ -264,7 +264,7 @@ function EmailEditor({
   const sample: LeadLike = { first_name: "Priya", last_name: "Sharma", company: "Acme Media", designation: "Marketing Head", industry: "FMCG", email: "priya@acme.com", custom_fields: {} };
   const previewRecipient = recipients.find((r) => r.id === previewId);
   const previewLead = previewRecipient ? toLead(previewRecipient.leads) : sample;
-  const preview = composeEmail({ subject, body, signature, lead: previewLead, unsubscribeUrl: "https://…/unsubscribe/…" });
+  const preview = composeEmail({ subject, body, signature, lead: previewLead, optOut: true });
   const missing = [...new Set([...missingVariables(subject, previewLead), ...missingVariables(body, previewLead)])];
 
   const customKeys = useMemo(() => {
@@ -322,7 +322,7 @@ function EmailEditor({
             ))}
           </div>
           <p className="mt-2 text-xs text-muted-foreground">
-            Add a fallback for empty values like {"{{first_name|there}}"}. Your signature and an unsubscribe link are added automatically.
+            Add a fallback for empty values like {"{{first_name|there}}"}. Your signature and a short "reply unsubscribe" line are added automatically.
           </p>
         </div>
         {editable && (
@@ -618,7 +618,7 @@ function ApproveDialog({
   ];
   const ready = checks.every((c) => c.ok) && confirmed;
   const preview = firstRecipient
-    ? composeEmail({ subject: campaign.subject, body: campaign.body, signature, lead: toLead(firstRecipient.leads), unsubscribeUrl: "https://…/unsubscribe/…" })
+    ? composeEmail({ subject: campaign.subject, body: campaign.body, signature, lead: toLead(firstRecipient.leads), optOut: true })
     : null;
   const perDay = Math.min(campaign.daily_limit, activeAccounts.reduce((t, a) => t + a.daily_limit, 0));
 
@@ -638,7 +638,7 @@ function ApproveDialog({
       toast.error(error.message);
       return;
     }
-    toast.success("Approved — sending starts within 5 minutes");
+    toast.success("Approved — sending starts within a minute");
     onOpenChange(false);
     await qc.invalidateQueries();
   }

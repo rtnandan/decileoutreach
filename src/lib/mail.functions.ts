@@ -63,7 +63,7 @@ export const sendTestEmail = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const { buildRawEmail, sendGmail } = await import("./gmail.server");
-    const { composeEmail, unsubscribeLinks } = await import("./compose");
+    const { composeEmail } = await import("./compose");
     const { supabase, userId } = context;
     const [{ data: campaign }, { data: account }, { data: settings }] = await Promise.all([
       supabase.from("campaigns").select("*").eq("id", data.campaignId).single(),
@@ -86,13 +86,12 @@ export const sendTestEmail = createServerFn({ method: "POST" })
       const { data: l } = await supabase.from("leads").select("*").eq("id", data.leadId).single();
       if (l) lead = l as unknown as Record<string, unknown>;
     }
-    const links = unsubscribeLinks(settings?.app_url, String(lead["unsubscribe_token"]));
     const { subject, body } = composeEmail({
       subject: campaign.subject,
       body: campaign.body,
       signature: settings?.signature,
       lead: lead as never,
-      unsubscribeUrl: links.page,
+      optOut: true,
     });
     const raw = buildRawEmail({
       from: account.email,
