@@ -12,7 +12,7 @@ export type ReplySyncResult = { newReplies: number; classified: number; notes: s
 const INBOX_QUERY = "in:inbox newer_than:14d -from:(mailer-daemon OR postmaster)";
 const MAX_NEW_PER_RUN = 10;
 
-export async function syncReplies(db: DB, opts: { ownerId?: string; classifyLimit?: number } = {}): Promise<ReplySyncResult> {
+export async function syncReplies(db: DB, opts: { ownerId?: string | undefined; classifyLimit?: number | undefined } = {}): Promise<ReplySyncResult> {
   const result: ReplySyncResult = { newReplies: 0, classified: 0, notes: [] };
   let aq = db.from("sending_accounts").select("id, owner_id, email, secret_name");
   if (opts.ownerId) aq = aq.eq("owner_id", opts.ownerId);
@@ -91,7 +91,7 @@ export async function syncReplies(db: DB, opts: { ownerId?: string; classifyLimi
 }
 
 /** Sorts saved replies that have no category yet (a few per run, so each run stays short). */
-async function classifyPending(db: DB, opts: { ownerId?: string; limit: number; notes: string[] }): Promise<number> {
+async function classifyPending(db: DB, opts: { ownerId?: string | undefined; limit: number; notes: string[] }): Promise<number> {
   let q = db
     .from("email_messages")
     .select("id, owner_id, lead_id, from_email, subject, body, gmail_thread_id")

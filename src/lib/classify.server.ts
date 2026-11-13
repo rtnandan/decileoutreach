@@ -47,7 +47,7 @@ function parseLoose(text: string | undefined): { category: ReplyCategory; summar
 export async function classifyReply(input: {
   subject: string;
   reply: string;
-  originalSubject?: string | null;
+  originalSubject?: string | null | undefined;
 }): Promise<{ category: ReplyCategory; summary: string }> {
   const apiKey = process.env["LOVABLE_API_KEY"];
   if (!apiKey) throw new AiUnavailableError("AI key is missing on the server.", 401);

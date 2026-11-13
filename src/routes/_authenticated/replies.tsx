@@ -135,7 +135,7 @@ function RepliesPage() {
                   </div>
                   <div className="flex shrink-0 items-center gap-2">
                     <ReplyCategoryBadge category={r.reply_category} />
-                    <Select value={r.reply_category ?? undefined} onValueChange={(v) => change(r.id, v)}>
+                    <Select value={r.reply_category ?? ""} onValueChange={(v) => change(r.id, v)}>
                       <SelectTrigger className="h-8 w-44 text-xs" aria-label="Change category">
                         <SelectValue placeholder="Set category" />
                       </SelectTrigger>

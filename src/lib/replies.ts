@@ -55,10 +55,10 @@ export function nextLeadStatus(current: string, category: ReplyCategory | null, 
 
 /** Sorts the obvious cases without AI: opt-out wording and automatic replies. */
 export function quickCategory(input: {
-  subject?: string | null;
+  subject?: string | null | undefined;
   text: string;
-  autoSubmitted?: string | null;
-  autoReplyHeader?: boolean;
+  autoSubmitted?: string | null | undefined;
+  autoReplyHeader?: boolean | undefined;
 }): ReplyCategory | null {
   const text = input.text.toLowerCase();
   if (/\b(unsubscribe|opt[ -]?out|remove me|take me off|stop (emailing|sending|contacting)|do not (email|contact)|don't (email|contact)|no more emails)\b/.test(text))
