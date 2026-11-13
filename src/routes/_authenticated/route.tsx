@@ -1,6 +1,6 @@
 import { createFileRoute, Link, Outlet, redirect, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { LayoutDashboard, LogOut, Mail, Send, ShieldOff, Users } from "lucide-react";
+import { Inbox, LayoutDashboard, LogOut, Mail, Send, ShieldOff, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { Wordmark } from "../index";
@@ -19,6 +19,7 @@ const NAV = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/leads", label: "Leads", icon: Users },
   { to: "/campaigns", label: "Campaigns", icon: Send },
+  { to: "/replies", label: "Replies", icon: Inbox },
   { to: "/accounts", label: "Sending accounts", icon: Mail },
   { to: "/suppression", label: "Suppression list", icon: ShieldOff },
 ] as const;

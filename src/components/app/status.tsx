@@ -1,5 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { leadStatusMeta } from "@/lib/email-utils";
+import { replyCategoryMeta } from "@/lib/replies";
 
 export function LeadStatusBadge({ status }: { status: string }) {
   const m = leadStatusMeta(status);
@@ -40,5 +41,11 @@ const ACCOUNT: Record<string, { label: string; tone: "success" | "warning" | "da
 };
 export function AccountStatusBadge({ status }: { status: string }) {
   const m = ACCOUNT[status] ?? { label: "Healthy", tone: "success" as const };
+  return <Badge variant={m.tone}>{m.label}</Badge>;
+}
+
+export function ReplyCategoryBadge({ category }: { category: string | null | undefined }) {
+  const m = replyCategoryMeta(category);
+  if (!m) return <Badge variant="neutral">Sorting…</Badge>;
   return <Badge variant={m.tone}>{m.label}</Badge>;
 }

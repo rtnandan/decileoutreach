@@ -138,3 +138,40 @@ export const checkBouncesNow = createServerFn({ method: "POST" })
     const { processBounces } = await import("./bounces.server");
     return processBounces(context.supabase, { ownerId: context.userId });
   });
+
+/** Checks the connected Gmail inboxes for bounces and new replies right now. */
+export const checkRepliesNow = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { processBounces } = await import("./bounces.server");
+    const { syncReplies } = await import("./replies.server");
+    const bounces = await processBounces(context.supabase, { ownerId: context.userId });
+    const replies = await syncReplies(context.supabase, { ownerId: context.userId, classifyLimit: 6 });
+    return { bounced: bounces.bounced, ...replies, notes: [...bounces.notes, ...replies.notes] };
+  });
+
+/** The owner corrects a reply's category; the lead's status follows. */
+export const setReplyCategory = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        messageId: z.string().uuid(),
+        category: z.enum(["interested", "meeting_request", "need_more_info", "not_interested", "follow_up_later", "out_of_office", "unsubscribe", "bounce", "other"]),
+      })
+      .parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    const { applyCategory } = await import("./replies.server");
+    const { supabase } = context;
+    const { data: msg, error } = await supabase
+      .from("email_messages")
+      .update({ reply_category: data.category })
+      .eq("id", data.messageId)
+      .eq("direction", "inbound")
+      .select("owner_id, lead_id, from_email")
+      .single();
+    if (error || !msg) throw new Error(error?.message ?? "Reply not found");
+    if (msg.lead_id) await applyCategory(supabase, { owner_id: msg.owner_id, lead_id: msg.lead_id, email: msg.from_email }, data.category, true);
+    return { ok: true as const };
+  });

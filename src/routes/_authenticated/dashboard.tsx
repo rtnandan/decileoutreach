@@ -144,7 +144,7 @@ function Dashboard() {
             {activity.map((m) => (
               <div key={m.id} className="flex flex-col gap-1 px-4 py-3 text-sm md:flex-row md:items-center md:gap-4">
                 <span className="tabular w-32 shrink-0 text-xs text-muted-foreground">{formatDateTime(m.sent_at ?? m.created_at)}</span>
-                <span className="w-56 shrink-0 truncate">{m.to_email}</span>
+                <span className="w-56 shrink-0 truncate">{m.direction === "inbound" ? `Reply from ${m.from_email}` : m.to_email}</span>
                 <span className="min-w-0 flex-1 truncate text-muted-foreground">{m.subject}</span>
                 <span className="flex items-center gap-2">
                   {m.is_test && <span className="eyebrow">test</span>}

@@ -177,6 +177,8 @@ export type Database = {
           is_test: boolean
           lead_id: string | null
           owner_id: string
+          reply_category: string | null
+          reply_summary: string | null
           sending_account_id: string | null
           sent_at: string | null
           status: string
@@ -198,6 +200,8 @@ export type Database = {
           is_test?: boolean
           lead_id?: string | null
           owner_id?: string
+          reply_category?: string | null
+          reply_summary?: string | null
           sending_account_id?: string | null
           sent_at?: string | null
           status?: string
@@ -219,6 +223,8 @@ export type Database = {
           is_test?: boolean
           lead_id?: string | null
           owner_id?: string
+          reply_category?: string | null
+          reply_summary?: string | null
           sending_account_id?: string | null
           sent_at?: string | null
           status?: string
@@ -269,6 +275,7 @@ export type Database = {
           industry: string
           last_contacted_at: string | null
           last_name: string
+          last_replied_at: string | null
           owner_id: string
           source: string
           status: string
@@ -286,6 +293,7 @@ export type Database = {
           industry?: string
           last_contacted_at?: string | null
           last_name?: string
+          last_replied_at?: string | null
           owner_id?: string
           source?: string
           status?: string
@@ -303,6 +311,7 @@ export type Database = {
           industry?: string
           last_contacted_at?: string | null
           last_name?: string
+          last_replied_at?: string | null
           owner_id?: string
           source?: string
           status?: string

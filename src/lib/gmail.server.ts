@@ -108,3 +108,49 @@ export async function gmailGetSnippet(secretName: string, id: string): Promise<s
   };
   return res.snippet ?? "";
 }
+
+type GmailPart = {
+  mimeType?: string;
+  headers?: { name: string; value: string }[];
+  body?: { data?: string; size?: number };
+  parts?: GmailPart[];
+};
+
+function decodeB64Url(data: string): string {
+  const bin = atob(data.replace(/-/g, "+").replace(/_/g, "/"));
+  return new TextDecoder().decode(Uint8Array.from(bin, (c) => c.charCodeAt(0)));
+}
+
+function collectBodies(part: GmailPart | undefined, out: { text: string[]; html: string[] }) {
+  if (!part) return;
+  const data = part.body?.data;
+  if (data && part.mimeType === "text/plain") out.text.push(decodeB64Url(data));
+  else if (data && part.mimeType === "text/html") out.html.push(decodeB64Url(data));
+  for (const p of part.parts ?? []) collectBodies(p, out);
+}
+
+/** One received message: headers, labels and its plain-text body. */
+export async function getMessageFull(secretName: string, id: string) {
+  const res = (await gmailFetch(secretName, `/users/me/messages/${encodeURIComponent(id)}?format=full`)) as {
+    id: string;
+    threadId: string;
+    labelIds?: string[];
+    snippet?: string;
+    internalDate?: string;
+    payload?: GmailPart;
+  };
+  const headers: Record<string, string> = {};
+  for (const h of res.payload?.headers ?? []) headers[h.name.toLowerCase()] = h.value;
+  const bodies = { text: [] as string[], html: [] as string[] };
+  collectBodies(res.payload, bodies);
+  const { htmlToText } = await import("./replies");
+  const text = bodies.text.join("\n") || (bodies.html.length ? htmlToText(bodies.html.join("\n")) : res.snippet ?? "");
+  return {
+    id: res.id,
+    threadId: res.threadId,
+    labelIds: res.labelIds ?? [],
+    headers,
+    text,
+    receivedAt: res.internalDate ? new Date(Number(res.internalDate)).toISOString() : new Date().toISOString(),
+  };
+}

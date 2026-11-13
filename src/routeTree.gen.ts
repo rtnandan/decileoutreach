@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedAccountsRouteImport } from './routes/_authenticated/accounts'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedRepliesRouteImport } from './routes/_authenticated/replies'
 import { Route as AuthenticatedSuppressionRouteImport } from './routes/_authenticated/suppression'
 import { Route as UnsubscribeTokenRouteImport } from './routes/unsubscribe.$token'
 import { Route as AuthenticatedCampaignsIndexRouteImport } from './routes/_authenticated/campaigns/index'
@@ -22,6 +23,7 @@ import { Route as AuthenticatedLeadsIndexRouteImport } from './routes/_authentic
 import { Route as AuthenticatedLeadsLeadIdRouteImport } from './routes/_authenticated/leads/$leadId'
 import { Route as AuthenticatedLeadsImportRouteImport } from './routes/_authenticated/leads/import'
 import { Route as ApiPublicUnsubscribeRouteImport } from './routes/api/public/unsubscribe'
+import { Route as ApiPublicJobsCheckInboxRouteImport } from './routes/api/public/jobs/check-inbox'
 import { Route as ApiPublicJobsSendBatchRouteImport } from './routes/api/public/jobs/send-batch'
 
 const IndexRoute = IndexRouteImport.update({
@@ -46,6 +48,11 @@ const AuthenticatedAccountsRoute = AuthenticatedAccountsRouteImport.update({
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedRepliesRoute = AuthenticatedRepliesRouteImport.update({
+  id: '/replies',
+  path: '/replies',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedSuppressionRoute =
@@ -93,6 +100,11 @@ const ApiPublicUnsubscribeRoute = ApiPublicUnsubscribeRouteImport.update({
   path: '/api/public/unsubscribe',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicJobsCheckInboxRoute = ApiPublicJobsCheckInboxRouteImport.update({
+  id: '/api/public/jobs/check-inbox',
+  path: '/api/public/jobs/check-inbox',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicJobsSendBatchRoute = ApiPublicJobsSendBatchRouteImport.update({
   id: '/api/public/jobs/send-batch',
   path: '/api/public/jobs/send-batch',
@@ -104,6 +116,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/accounts': typeof AuthenticatedAccountsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/replies': typeof AuthenticatedRepliesRoute
   '/suppression': typeof AuthenticatedSuppressionRoute
   '/unsubscribe/$token': typeof UnsubscribeTokenRoute
   '/campaigns/$campaignId': typeof AuthenticatedCampaignsCampaignIdRoute
@@ -112,6 +125,7 @@ export interface FileRoutesByFullPath {
   '/api/public/unsubscribe': typeof ApiPublicUnsubscribeRoute
   '/campaigns/': typeof AuthenticatedCampaignsIndexRoute
   '/leads/': typeof AuthenticatedLeadsIndexRoute
+  '/api/public/jobs/check-inbox': typeof ApiPublicJobsCheckInboxRoute
   '/api/public/jobs/send-batch': typeof ApiPublicJobsSendBatchRoute
 }
 export interface FileRoutesByTo {
@@ -119,6 +133,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/accounts': typeof AuthenticatedAccountsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/replies': typeof AuthenticatedRepliesRoute
   '/suppression': typeof AuthenticatedSuppressionRoute
   '/unsubscribe/$token': typeof UnsubscribeTokenRoute
   '/campaigns/$campaignId': typeof AuthenticatedCampaignsCampaignIdRoute
@@ -127,6 +142,7 @@ export interface FileRoutesByTo {
   '/api/public/unsubscribe': typeof ApiPublicUnsubscribeRoute
   '/campaigns': typeof AuthenticatedCampaignsIndexRoute
   '/leads': typeof AuthenticatedLeadsIndexRoute
+  '/api/public/jobs/check-inbox': typeof ApiPublicJobsCheckInboxRoute
   '/api/public/jobs/send-batch': typeof ApiPublicJobsSendBatchRoute
 }
 export interface FileRoutesById {
@@ -136,6 +152,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/accounts': typeof AuthenticatedAccountsRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/replies': typeof AuthenticatedRepliesRoute
   '/_authenticated/suppression': typeof AuthenticatedSuppressionRoute
   '/unsubscribe/$token': typeof UnsubscribeTokenRoute
   '/_authenticated/campaigns/$campaignId': typeof AuthenticatedCampaignsCampaignIdRoute
@@ -144,6 +161,7 @@ export interface FileRoutesById {
   '/api/public/unsubscribe': typeof ApiPublicUnsubscribeRoute
   '/_authenticated/campaigns/': typeof AuthenticatedCampaignsIndexRoute
   '/_authenticated/leads/': typeof AuthenticatedLeadsIndexRoute
+  '/api/public/jobs/check-inbox': typeof ApiPublicJobsCheckInboxRoute
   '/api/public/jobs/send-batch': typeof ApiPublicJobsSendBatchRoute
 }
 export interface FileRouteTypes {
@@ -153,6 +171,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/accounts'
     | '/dashboard'
+    | '/replies'
     | '/suppression'
     | '/unsubscribe/$token'
     | '/campaigns/$campaignId'
@@ -161,6 +180,7 @@ export interface FileRouteTypes {
     | '/api/public/unsubscribe'
     | '/campaigns/'
     | '/leads/'
+    | '/api/public/jobs/check-inbox'
     | '/api/public/jobs/send-batch'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -168,6 +188,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/accounts'
     | '/dashboard'
+    | '/replies'
     | '/suppression'
     | '/unsubscribe/$token'
     | '/campaigns/$campaignId'
@@ -176,6 +197,7 @@ export interface FileRouteTypes {
     | '/api/public/unsubscribe'
     | '/campaigns'
     | '/leads'
+    | '/api/public/jobs/check-inbox'
     | '/api/public/jobs/send-batch'
   id:
     | '__root__'
@@ -184,6 +206,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/accounts'
     | '/_authenticated/dashboard'
+    | '/_authenticated/replies'
     | '/_authenticated/suppression'
     | '/unsubscribe/$token'
     | '/_authenticated/campaigns/$campaignId'
@@ -192,6 +215,7 @@ export interface FileRouteTypes {
     | '/api/public/unsubscribe'
     | '/_authenticated/campaigns/'
     | '/_authenticated/leads/'
+    | '/api/public/jobs/check-inbox'
     | '/api/public/jobs/send-batch'
   fileRoutesById: FileRoutesById
 }
@@ -201,6 +225,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   UnsubscribeTokenRoute: typeof UnsubscribeTokenRoute
   ApiPublicUnsubscribeRoute: typeof ApiPublicUnsubscribeRoute
+  ApiPublicJobsCheckInboxRoute: typeof ApiPublicJobsCheckInboxRoute
   ApiPublicJobsSendBatchRoute: typeof ApiPublicJobsSendBatchRoute
 }
 
@@ -239,6 +264,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/replies': {
+      id: '/_authenticated/replies'
+      path: '/replies'
+      fullPath: '/replies'
+      preLoaderRoute: typeof AuthenticatedRepliesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/suppression': {
@@ -297,6 +329,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicUnsubscribeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/jobs/check-inbox': {
+      id: '/api/public/jobs/check-inbox'
+      path: '/api/public/jobs/check-inbox'
+      fullPath: '/api/public/jobs/check-inbox'
+      preLoaderRoute: typeof ApiPublicJobsCheckInboxRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/jobs/send-batch': {
       id: '/api/public/jobs/send-batch'
       path: '/api/public/jobs/send-batch'
@@ -310,6 +349,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAccountsRoute: typeof AuthenticatedAccountsRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedRepliesRoute: typeof AuthenticatedRepliesRoute
   AuthenticatedSuppressionRoute: typeof AuthenticatedSuppressionRoute
   AuthenticatedCampaignsCampaignIdRoute: typeof AuthenticatedCampaignsCampaignIdRoute
   AuthenticatedLeadsLeadIdRoute: typeof AuthenticatedLeadsLeadIdRoute
@@ -321,6 +361,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAccountsRoute: AuthenticatedAccountsRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedRepliesRoute: AuthenticatedRepliesRoute,
   AuthenticatedSuppressionRoute: AuthenticatedSuppressionRoute,
   AuthenticatedCampaignsCampaignIdRoute: AuthenticatedCampaignsCampaignIdRoute,
   AuthenticatedLeadsLeadIdRoute: AuthenticatedLeadsLeadIdRoute,
@@ -338,6 +379,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   UnsubscribeTokenRoute: UnsubscribeTokenRoute,
   ApiPublicUnsubscribeRoute: ApiPublicUnsubscribeRoute,
+  ApiPublicJobsCheckInboxRoute: ApiPublicJobsCheckInboxRoute,
   ApiPublicJobsSendBatchRoute: ApiPublicJobsSendBatchRoute,
 }
 export const routeTree = rootRouteImport

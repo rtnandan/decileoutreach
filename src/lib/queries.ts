@@ -170,7 +170,7 @@ export const recentActivityQuery = () =>
       ok(
         await supabase
           .from("email_messages")
-          .select("id, to_email, subject, status, sent_at, created_at, is_test, error, lead_id, campaigns(name)")
+          .select("id, to_email, from_email, direction, subject, status, sent_at, created_at, is_test, error, lead_id, campaigns(name)")
           .order("created_at", { ascending: false })
           .limit(8),
       ),
@@ -181,4 +181,20 @@ export const suppressionsQuery = () =>
     queryKey: ["suppressions"],
     queryFn: async () =>
       ok(await supabase.from("suppressions").select("*").order("created_at", { ascending: false }).limit(1000)),
+  });
+
+export const repliesQuery = (category?: string) =>
+  queryOptions({
+    queryKey: ["replies", category ?? "all"],
+    queryFn: async () => {
+      let q = supabase
+        .from("email_messages")
+        .select("id, from_email, subject, body, reply_category, reply_summary, sent_at, created_at, lead_id, leads(id, first_name, last_name, company, status), campaigns(name)")
+        .eq("direction", "inbound")
+        .order("sent_at", { ascending: false, nullsFirst: false })
+        .limit(300);
+      if (category === "unsorted") q = q.is("reply_category", null);
+      else if (category) q = q.eq("reply_category", category);
+      return ok(await q);
+    },
   });

@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { EmptyState, PageHeader, formatDateTime } from "@/components/app/page";
-import { CampaignStatusBadge, DeliveryBadge, LeadStatusBadge } from "@/components/app/status";
+import { CampaignStatusBadge, DeliveryBadge, LeadStatusBadge, ReplyCategoryBadge } from "@/components/app/status";
 import { supabase } from "@/integrations/supabase/client";
 import { LEAD_STATUSES } from "@/lib/email-utils";
 import { leadQuery } from "@/lib/queries";
@@ -181,11 +181,14 @@ function LeadPage() {
           ) : (
             <div className="space-y-3">
               {messages.map((m) => (
-                <article key={m.id} className="rounded-lg border bg-card p-4 shadow-card">
+                <article
+                  key={m.id}
+                  className={m.direction === "inbound" ? "rounded-lg border border-signal/40 bg-signal-soft/30 p-4 shadow-card md:ml-8" : "rounded-lg border bg-card p-4 shadow-card"}
+                >
                   <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                     <span className="tabular">{formatDateTime(m.sent_at ?? m.created_at)}</span>
                     <span>·</span>
-                    <span>{m.direction === "outbound" ? `From ${m.from_email}` : `From ${m.to_email}`}</span>
+                    <span>{m.direction === "outbound" ? `Sent from ${m.from_email}` : `Reply from ${m.from_email}`}</span>
                     {m.campaigns?.name && (
                       <>
                         <span>·</span>
@@ -193,9 +196,12 @@ function LeadPage() {
                       </>
                     )}
                     <span className="ml-auto">
-                      <DeliveryBadge status={m.status} />
+                      {m.direction === "inbound" ? <ReplyCategoryBadge category={m.reply_category} /> : <DeliveryBadge status={m.status} />}
                     </span>
                   </div>
+                  {m.direction === "inbound" && m.reply_summary && (
+                    <p className="mt-2 text-sm font-medium text-signal">{m.reply_summary}</p>
+                  )}
                   <h3 className="mt-2 font-sans text-base font-semibold">{m.subject}</h3>
                   <pre className="mt-2 whitespace-pre-wrap font-sans text-sm text-foreground/85">{m.body}</pre>
                   {m.error && <p className="mt-2 text-xs text-destructive">{m.error}</p>}
